@@ -1,24 +1,11 @@
 #include "ProcessLauncher.h"
-#include <stdexcept>
-#include <thread>
-#include <array>
-#include <iostream>
 
 using std::string;
 using std::future;
 using std::async;
 using std::launch;
 
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-    #include <sys/types.h>
-    #include <sys/wait.h>
-#endif
-
-void ProcessLauncher::launch(const string& filePath, const string& args)
-{
+void ProcessLauncher::launch(const string &filePath, const string &args) {
 #ifdef _WIN32
     string command = filePath + " " + args;
     STARTUPINFO si;
@@ -31,8 +18,8 @@ void ProcessLauncher::launch(const string& filePath, const string& args)
     path p(filePath);
     string directory = p.parent_path().string();
 
-    if (!CreateProcess(NULL, const_cast<char*>(command.c_str()), NULL, NULL, FALSE, 0, NULL, directory.empty() ? NULL : directory.c_str(), &si, &pi))
-    {
+    if (!CreateProcess(nullptr, const_cast<char *>(command.c_str()), nullptr, nullptr, FALSE, 0, nullptr,
+                       directory.empty() ? nullptr : directory.c_str(), &si, &pi)) {
         throw std::runtime_error("CreateProcess failed");
     }
 
@@ -53,14 +40,29 @@ void ProcessLauncher::launch(const string& filePath, const string& args)
 #endif
 }
 
-future<string> ProcessLauncher::launchAsync(const string& filePath, const string& args)
-{
+future<string> ProcessLauncher::launchAsync(const string &filePath, const string &args) {
     return async(launch::async, [=]() {
         string output;
 
 #ifdef _WIN32
-        // Windows-specific code to launch and read from the process
-        // ...
+        string command = filePath + " " + args;
+        STARTUPINFO si;
+        PROCESS_INFORMATION pi;
+
+        ZeroMemory(&si, sizeof(si));
+        si.cb = sizeof(si);
+        ZeroMemory(&pi, sizeof(pi));
+
+        path p(filePath);
+        string directory = p.parent_path().string();
+
+        if (!CreateProcess(nullptr, const_cast<char *>(command.c_str()), nullptr, nullptr, FALSE, 0, nullptr,
+                           directory.empty() ? nullptr : directory.c_str(), &si, &pi)) {
+            throw std::runtime_error("CreateProcess failed");
+        }
+
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
 #else
         string command = filePath + " " + args;
         FILE* pipe = popen(command.c_str(), "r");

@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_library(CFrpController SHARED
         main.cpp
-        cpptoml.h
-        Classes.h
-        Classes.cpp
-        ProcessLauncher.h
-        ProcessLauncher.cpp)
+        lib/cpptoml.h
+        lib/Classes.h
+        lib/Classes.cpp
+        lib/ProcessLauncher.h
+        lib/ProcessLauncher.cpp)

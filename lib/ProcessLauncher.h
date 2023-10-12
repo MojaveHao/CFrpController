@@ -3,9 +3,22 @@
 
 #include <string>
 #include <future>
+#include <filesystem>
+#include <stdexcept>
+#include <array>
+
+
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+    #include <sys/types.h>
+    #include <sys/wait.h>
+#endif
 
 using std::string;
 using std::future;
+using std::filesystem::path;
 
 class ProcessLauncher
 {

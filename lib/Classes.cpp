@@ -1,10 +1,8 @@
 #include "Classes.h"
 #include "cpptoml.h"
 #include <iostream>
-#include <cassert>
 #include <string>
 #include <vector>
-#include <cstdlib>
 
 using std::string,std::vector;
 
@@ -13,7 +11,7 @@ public:
     string name;
     string path;
     vector<string> args;
-    inline CFrpClasses::baseFrp readInfo(string path,string name);
+    static inline CFrpClasses::baseFrp readInfo(const string& path,const string& name);
     void startFrp();
 };
 
@@ -23,9 +21,9 @@ public:
     string proxy;
 };
 
-CFrpClasses::baseFrp CFrpClasses::baseFrp::readInfo(string path,string name)
+CFrpClasses::baseFrp CFrpClasses::baseFrp::readInfo(const string& path,const string& name)
 {
-    std::shared_ptr<cpptoml::table> config = cpptoml::parse_file(filename: path);
+    std::shared_ptr<cpptoml::table> config = cpptoml::parse_file(path);
     cpptoml::option<string> cname;
     cname = config->get_qualified_as<string>(name + ".name");
     cpptoml::option<string> cpath;
